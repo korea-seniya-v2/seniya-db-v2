@@ -61,21 +61,6 @@ CREATE TABLE IF NOT EXISTS `passes` (
 ) CHARACTER SET utf8mb4
 COLLATE utf8mb4_unicode_ci;
 
--- # 트리거
-
-DELIMITER $$
-CREATE TRIGGER reduce_class_ticket
-AFTER UPDATE ON passes
-FOR EACH ROW
-BEGIN
-    IF OLD.used = FALSE AND NEW.used = TRUE THEN
-        UPDATE users
-        SET class_ticket = class_ticket - 1
-        WHERE user_id = NEW.user_id;
-    END IF;
-END $$
-
-DELIMITER ;
 
 -- payment 승인 후 자동으로 pass 생성
 DELIMITER $$
@@ -263,6 +248,55 @@ CREATE TABLE IF NOT EXISTS `participations` (
   Foreign Key (course_id) REFERENCES courses(course_id) ON DELETE CASCADE
 ) CHARACTER SET utf8mb4
 COLLATE utf8mb4_unicode_ci;
+
+-- # 트리거
+DELIMITER //
+
+CREATE TRIGGER trg_use_pass_after_participation
+AFTER INSERT ON participations
+FOR EACH ROW
+BEGIN
+    UPDATE passes
+    SET used = TRUE,
+        used_at = NOW()
+    WHERE pass_id = (
+        SELECT pass_id FROM (
+            SELECT pass_id
+            FROM passes
+            WHERE user_id = NEW.user_id AND used = FALSE
+            ORDER BY issued_at ASC
+            LIMIT 1
+        ) AS oldest_unused_pass
+    );
+END;
+//
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+CREATE TRIGGER after_participation_delete
+AFTER DELETE ON participations
+FOR EACH ROW
+BEGIN
+  UPDATE passes
+  SET used = FALSE,
+      used_at = NULL
+  WHERE pass_id = (
+    SELECT pass_id
+    FROM (
+      SELECT pass_id
+      FROM passes
+      WHERE user_id = OLD.user_id AND used = TRUE
+      ORDER BY used_at DESC
+      LIMIT 1
+    ) AS subquery
+  );
+END$$
+
+DELIMITER ;
+
 
 -- 공지사항 테이블
 CREATE TABLE IF NOT EXISTS `notices` (
