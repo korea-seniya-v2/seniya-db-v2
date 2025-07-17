@@ -186,9 +186,7 @@ CREATE TABLE IF NOT EXISTS `inquiries` (
   trainer_id INT,
   title VARCHAR(255) NOT NULL,
   content TEXT NOT NULL,
-  response TEXT,
-  responsed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  is_privated BOOLEAN DEFAULT FALSE,
+  inquiry_status ENUM("WAITING", "COMPLETED"),
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   Foreign Key (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
@@ -196,7 +194,19 @@ CREATE TABLE IF NOT EXISTS `inquiries` (
 ) CHARACTER SET utf8mb4
 COLLATE utf8mb4_unicode_ci;
 
--- 게시글
+-- 문의 답변 테이블
+CREATE TABLE IF NOT EXISTS `answers` (
+  answer_id INT PRIMARY KEY AUTO_INCREMENT,
+  user_id INT NOT NULL,
+  inquiry_id INT NOT NULL,
+  content TEXT NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  Foreign Key (user_id) REFERENCES users(user_id),
+  Foreign Key (inquiry_id) REFERENCES inquiries(inquiry_id)
+) CHARACTER SET utf8mb4
+COLLATE utf8mb4_unicode_ci;
+
+-- 게시글 테이블
 CREATE TABLE IF NOT EXISTS `posts` (
   post_id INT PRIMARY KEY AUTO_INCREMENT,
   user_id INT NOT NULL,
@@ -320,7 +330,7 @@ CREATE TABLE IF NOT EXISTS `upload_files` (
   file_type VARCHAR(100),
   file_size BIGINT NOT NULL,
   target_id INT,
-  target_type ENUM('TRAINER_PROFILE', 'POST'),
+  target_type ENUM('TRAINER_PROFILE', 'POST', 'INQUIRY'),
   INDEX idx_target(target_type, target_id)
 ) CHARACTER SET utf8mb4
 COLLATE utf8mb4_unicode_ci;
