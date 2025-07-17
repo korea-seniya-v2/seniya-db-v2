@@ -186,7 +186,6 @@ CREATE TABLE IF NOT EXISTS `inquiries` (
   trainer_id INT,
   title VARCHAR(255) NOT NULL,
   content TEXT NOT NULL,
-  response TEXT,
   responsed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   is_privated BOOLEAN DEFAULT FALSE,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
