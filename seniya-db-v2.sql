@@ -183,14 +183,14 @@ COLLATE utf8mb4_unicode_ci;
 CREATE TABLE IF NOT EXISTS `inquiries` (
   inquiry_id INT PRIMARY KEY AUTO_INCREMENT,
   user_id INT NOT NULL,
-  trainer_id INT,
+  admin INT NOT NULL,
   title VARCHAR(255) NOT NULL,
   content TEXT NOT NULL,
   inquiry_status ENUM("WAITING", "COMPLETED"),
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   Foreign Key (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-  Foreign Key (trainer_id) REFERENCES trainer_profiles(trainer_id)
+  Foreign Key (admin) REFERENCES users(user_id) ON DELETE CASCADE
 ) CHARACTER SET utf8mb4
 COLLATE utf8mb4_unicode_ci;
 
@@ -338,3 +338,4 @@ COLLATE utf8mb4_unicode_ci;
 -- Util
 -- select * from users;
 -- drop database `seniya_db_v2`;
+select * from inquiries;
