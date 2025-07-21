@@ -183,14 +183,12 @@ COLLATE utf8mb4_unicode_ci;
 CREATE TABLE IF NOT EXISTS `inquiries` (
   inquiry_id INT PRIMARY KEY AUTO_INCREMENT,
   user_id INT NOT NULL,
-  admin INT NOT NULL,
   title VARCHAR(255) NOT NULL,
   content TEXT NOT NULL,
   inquiry_status ENUM("WAITING", "COMPLETED"),
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  Foreign Key (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-  Foreign Key (admin) REFERENCES users(user_id) ON DELETE CASCADE
+  Foreign Key (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 ) CHARACTER SET utf8mb4
 COLLATE utf8mb4_unicode_ci;
 
